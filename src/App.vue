@@ -1,17 +1,29 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+  <div id="app">
+    <TrilobiteList :items="dataFromApi"></TrilobiteList>
+  </div>
 </template>
 
-<script>
-import HelloWorld from './components/HelloWorld.vue'
+<script setup>
+import {ref } from 'vue';
+import uniqueId from 'lodash.uniqueid'
+import TrilobiteList from './components/TrilobiteList.vue';
 
-export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
+const dataFromApi = ref([]);
+async function getData() {
+  const response = await fetch('https://api.gbif.org/v1/species/search?rank=SPECIES&highertaxon_key=9273948&status=ACCEPTED');
+  const result = await response.json();
+  dataFromApi.value = result['results'].map((species) => {
+    return {
+          label: species['canonicalName'],
+          done: Math.random() < 0.5,
+          id: uniqueId("todo-")
+    }
+  });
 }
+getData()
+
+
 </script>
 
 <style>
